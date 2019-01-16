@@ -8,8 +8,17 @@
 		The rates will be either stored in a JSON file, or read from real time stats
 */
 
-// The currency that all other currencies are measured against.
-var measurement_currency = 'USD'; // also known as the std. value
+// Testing util
+const log = (str) => console.log(str);
+
+// The currency that all other currencies are measured/valued against.
+var std_currency = 'USD'; // also known as the std. value
+// Function to set the currency to be used as the std. of conversion.
+const set_std_currency = (cur) => rates[cur] ? (std_currency = cur) : new Error('ERROR: Currency does not exist');
+// How precise in Decimal Points.
+var precision = 3;
+// Function to set precision level
+const set_precision = (dpts) => precision = dpts; // Set to the input decimal points
 
 const rates = {
 	USD: 1,
@@ -18,9 +27,22 @@ const rates = {
 	AUD: 1.39
 };
 
-// Function to check if the currency exists.
-const currencyCheck = (currency) => (!rates[currency]) ? new Error('ERROR: Specified currency does not exist') : true;
+// Function to convert currency to uppercase, which is used throught the whole program.
+const getCurrency = (cur) => cur.trim().toUpperCase();
 // Convert the given currency into the standard measurement currency
-const convertToMeasurementCurrency = (currency, amnt) => currencyCheck(currency) ? (amnt / rates[currency]) : false;
+const convertToStdCurrency = (cur, amnt) => rates[cur] ? (amnt / rates[cur]) : new Error('ERROR: Currency does not exist');
 // Convert currency from USD to the specified currency
-const convertTo = (currency, amnt) => currencyCheck(currency) ? (amnt * rates[currency]) : false;
+const convertTo = (cur, amnt) => rates[cur] ? (amnt * rates[cur]) : new Error('ERROR: Currency does not exist');
+
+function convert2(frm, to, amnt) {
+	// Clean and format the input first
+	frm = getCurrency(frm);
+	to = getCurrency(to);
+
+	return Number(convertTo(to, convertToStdCurrency(frm, amnt)).toFixed(precision));
+}
+
+// Function that converts the amount from currency 'frm' to currency 'to'
+const convert = (frm, to, amnt) => Number(convertTo(getCurrency(to), convertToStdCurrency(getCurrency(frm), amnt)).toFixed(precision));
+
+log(convert('aud', 'sgd', 1));
