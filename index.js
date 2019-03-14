@@ -80,15 +80,13 @@ const getCurrency = (cur) => cur.trim().toUpperCase();
 // Convert the given currency into the standard measurement currency
 const convertToStdCurrency = (cur, amnt) => rates[cur] ? (amnt / rates[cur]) : new Error('ERROR: Currency does not exist');
 // Convert currency from USD to the specified currency
-const convertTo = (cur, amnt) => rates[cur] ? (amnt * rates[cur]) : new Error('ERROR: Currency does not exist');
+// const convertTo = (cur, amnt) => rates[cur] ? (amnt * rates[cur]) : new Error('ERROR: Currency does not exist');
+// Below function is the curried version of the above function
+const convertTo = (cur) => (amnt) => rates[cur] ? (amnt * rates[cur]) : new Error('ERROR: Currency does not exist');
+// Below is basically the same function as above but with a more descriptive name.
+const convert_from_std_cur = (cur) => (amnt) => rates[cur] ? (amnt * rates[cur]) : new Error('ERROR: Currency does not exist');
 
-function convert2(frm, to, amnt) {
-    // Clean and format the input first
-    frm = getCurrency(frm);
-    to = getCurrency(to);
 
-    return Number(convertTo(to, convertToStdCurrency(frm, amnt)).toFixed(precision));
-}
 
 /*  Below convert functions converts the amount from currency 'frm' to currency 'to'
     There are 2 versions of it, one using a normal arrow function syntax
@@ -100,3 +98,9 @@ function convert2(frm, to, amnt) {
 
 const convert = (amnt) => (frm) => (to) => Number(convertTo(getCurrency(to), convertToStdCurrency(getCurrency(frm), amnt)).toFixed(precision));
 print(convert(1)('aud')('sgd'));
+
+// Function that given 2 currencies, return a converter between these 2 currencies
+const converter = (frm) => (to) => (amnt) => Number(convertTo(getCurrency(to), convertToStdCurrency(getCurrency(frm), amnt)).toFixed(precision));
+// Create a AUD to SGD converter
+const aud_to_sgd_converter = converter('aud')('sgd');
+print(aud_to_sgd_converter(1));
